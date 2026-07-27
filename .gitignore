@@ -1,0 +1,27 @@
+# Dependencies and builds
+node_modules/
+.next/
+out/
+dist/
+coverage/
+test-results/
+playwright-report/
+*.tsbuildinfo
+
+# Local environments and secrets
+.env
+.env.*
+!.env.example
+*.local-secret
+
+# Hosting and temporary output
+.vercel/
+.tmp/
+tmp/
+
+# Private editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
