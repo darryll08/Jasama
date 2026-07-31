@@ -13,7 +13,7 @@ describe("design foundation", () => {
     expect(globalStyles).toMatch(/outline:\s*3px solid/);
     expect(globalStyles).toMatch(/outline-offset:\s*2px/);
     expect(globalStyles).toMatch(
-      /\.skip-link:focus-visible\s*\{[^}]*outline-color:\s*var\(--color-action-focus-inverse\)/s,
+      /\.site-header[\s\S]*outline-color:\s*var\(--color-action-focus-inverse\)/s,
     );
   });
 

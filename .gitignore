@@ -7,6 +7,12 @@ coverage/
 test-results/
 playwright-report/
 *.tsbuildinfo
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
 
 # Local environments and secrets
 .env

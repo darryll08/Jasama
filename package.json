@@ -12,9 +12,18 @@
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "db:reset": "supabase db reset",
+    "db:lint": "supabase db lint --local --level error --schema public --schema private --schema provisioning",
+    "db:types": "supabase gen types --lang typescript --local --schema public > lib/supabase/database.types.ts",
+    "test:rls": "supabase test db supabase/tests/database --local"
   },
   "dependencies": {
+    "@supabase/ssr": "0.12.4",
+    "@supabase/supabase-js": "2.111.0",
     "next": "16.2.12",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -31,6 +40,7 @@
     "eslint": "9.39.5",
     "eslint-config-next": "16.2.12",
     "jsdom": "29.1.1",
+    "supabase": "2.110.0",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3",
     "vitest": "4.1.10"

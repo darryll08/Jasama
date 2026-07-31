@@ -1,6 +1,6 @@
 # Jasama Implementation Plan
 
-_Last updated: 2026-07-28_
+_Last updated: 2026-07-29_
 
 ## Document authority
 
@@ -20,7 +20,7 @@ checks pass, its scope is audited, and its completion status is recorded.
 | Phase | Status | Completion date |
 |---|---|---|
 | Phase 0 — Repository and quality foundation | **Complete** | 2026-07-28 |
-| Phase 1 — Supabase foundation, account profile, and authorization | **Ready, not started** | — |
+| Phase 1 — Supabase foundation, account profile, and authorization | **Local verification; remote deployment and administrator bootstrap pending** | — |
 | Phase 2–10 | **Not started** | — |
 
 ### Phase 0 completion evidence
@@ -169,7 +169,8 @@ Phase 1 must not begin before:
 
 ## Phase 1 — Supabase foundation, account profile, and authorization
 
-- **Status:** Ready, not started.
+- **Status:** Local verification; remote deployment and administrator bootstrap
+  remain pending.
 - **Objective:** Establish identity, base profiles, least-privilege
   authorization, and deployment-controlled initial administrator access.
 - **In scope:** Supabase clients by runtime, Auth-to-profile lifecycle, contact
@@ -197,10 +198,11 @@ Phase 1 must not begin before:
   `grantAdminPermission`/`revokeAdminPermission` where approved. Bootstrap is a
   reviewed migration or provisioning-owner operation, never an application
   command or RPC.
-- **RLS policies:** Owners may read and update only approved profile fields;
-  public projection is minimal; contact facts are owner/service-only;
-  assignments are subject-readable and permission-manager-writable;
-  audit/outbox/idempotency records are privileged-only.
+- **RLS policies:** Owners may read only approved profile and active-contact
+  status columns; profile changes use the reviewed owner command; effective
+  ordinary grants use the minimum safe function projection; base permission,
+  assignment, audit, outbox, idempotency, and environment tables remain
+  privileged-only.
 - **Tests:** Auth/profile lifecycle, deny-by-default RLS, cross-user denial,
   self-grant denial, insufficient-manager denial, successful exact bootstrap,
   idempotent replay, runtime user/admin provisioning denial, set-expansion
@@ -211,7 +213,10 @@ Phase 1 must not begin before:
   redaction.
 - **Data/demo behavior:** Optional non-production profile fixtures are marked
   `is_demo`; production constraints reject them. The bootstrap target must be
-  an existing active, non-demo, Auth-backed profile.
+  an existing active, non-demo, Auth-backed profile. The committed
+  `app_environment` seed is local-development configuration only; staging uses
+  the reviewed deployment-only environment operation. Callable production
+  enablement remains unavailable until verified reauthentication is approved.
 - **Security checks:** Service-role credentials and encryption material remain
   server-only; exact grant target, permission set, and change reference are
   reviewed; no generic role, generic `is_verified`, self-grant, or runtime

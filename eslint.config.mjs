@@ -13,6 +13,7 @@ export default defineConfig([
     "coverage/**",
     "dist/**",
     "out/**",
+    "supabase/.temp/**",
     "test-results/**",
   ]),
 ]);

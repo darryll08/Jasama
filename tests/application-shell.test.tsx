@@ -27,7 +27,7 @@ describe("Phase 0 application shell", () => {
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(
       screen.getByRole("heading", {
-        name: "Fondasi aplikasi Jasama telah disiapkan.",
+        name: "Fondasi akun Jasama siap diuji secara lokal.",
       }),
     ).toBeInTheDocument();
   });
