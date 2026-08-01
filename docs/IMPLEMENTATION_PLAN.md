@@ -1,6 +1,6 @@
 # Jasama Implementation Plan
 
-_Last updated: 2026-07-29_
+_Last updated: 2026-08-01_
 
 ## Document authority
 
@@ -20,7 +20,7 @@ checks pass, its scope is audited, and its completion status is recorded.
 | Phase | Status | Completion date |
 |---|---|---|
 | Phase 0 — Repository and quality foundation | **Complete** | 2026-07-28 |
-| Phase 1 — Supabase foundation, account profile, and authorization | **Local verification; remote deployment and administrator bootstrap pending** | — |
+| Phase 1 — Supabase foundation, account profile, and authorization | **Hosted development verification complete; final approval pending** | — |
 | Phase 2–10 | **Not started** | — |
 
 ### Phase 0 completion evidence
@@ -169,8 +169,8 @@ Phase 1 must not begin before:
 
 ## Phase 1 — Supabase foundation, account profile, and authorization
 
-- **Status:** Local verification; remote deployment and administrator bootstrap
-  remain pending.
+- **Status:** Hosted development verification completed on 2026-08-01; final
+  Phase 1 approval remains pending.
 - **Objective:** Establish identity, base profiles, least-privilege
   authorization, and deployment-controlled initial administrator access.
 - **In scope:** Supabase clients by runtime, Auth-to-profile lifecycle, contact
@@ -243,9 +243,31 @@ Phase 1 must not begin before:
   ordinary grants through audited management and use reviewed provisioning
   recovery only when no valid permission manager remains. Never delete audit
   history.
-- **Dependencies and blockers:** Supabase project and secret access,
-  provisioning reviewers, bootstrap target, and contact-email mechanism. Phone
+- **Dependencies and blockers:** The hosted-development Supabase access,
+  contact-email delivery, bootstrap target, exact ordinary permission set, and
+  provisioning audit/replay checks are complete. The exit gate still requires
+  initial staging administrator provisioning and final Phase 1 approval. Phone
   verification may remain unimplemented here but blocks Phase 3 entry.
+
+### Phase 1 hosted development verification evidence — 2026-08-01
+
+- The Phase 1 migration is applied to the hosted `jasama-dev` Supabase project.
+- Hosted signup, email confirmation, sign-in, sign-out, password recovery,
+  password update, profile read, and profile update passed.
+- Development email delivery through the Mailtrap sandbox passed.
+- The verified hosted profile is Auth-backed, email-confirmed, active, and
+  non-demo.
+- `app_environment` is `development` with `demo_allowed=true` and
+  `mock_payment_allowed=true`.
+- `provisioning.bootstrap_admin` completed with change reference
+  `JASAMA-PHASE1-BOOTSTRAP-001` and exactly these global ordinary permissions:
+  `admin.permissions.manage`, `profile.support`, and `account.moderate`.
+- The three assignments and the `system_provisioning` audit record were
+  verified. Exact replay created no duplicate assignment, and each active
+  permission has exactly one assignment.
+- `admin.permissions.high_risk` remains inactive and unassigned.
+- No production, real-money, government-ID, Phase 2, or high-risk
+  administrator capability was enabled.
 
 ## Phase 2 — Public homepage and discovery with demo data
 

@@ -12,21 +12,23 @@ first: people can explore approved `Jasa`, publish a `Permintaan`, compare
   frozen-lockfile installation, lint, typecheck, 13 unit tests, production
   build, environment validation, and CI configuration.
 
-- **Phase 1 — Local verification**
-  The local Supabase foundation, account profile, authorization, audit,
-  idempotency/outbox schema and transaction foundations, environment guard,
-  and accessible email/password Auth flows are implemented. Remote deployment,
-  external outbox delivery, asynchronous workers, and administrator bootstrap
-  remain pending review.
+- **Phase 1 — Hosted development verification complete**
+  The local and hosted-development Supabase foundation, account profile,
+  authorization, audit, idempotency/outbox schema and transaction foundations,
+  environment guard, accessible email/password Auth flows, custom development
+  SMTP delivery, and exact ordinary administrator bootstrap were verified on
+  1 August 2026. External outbox delivery and asynchronous workers remain
+  later-phase work, not Phase 1 closure requirements.
 
 Phase 0 provides the root Next.js application and quality foundation. Phase 1A
 adds a reproducible local database, deny-by-default RLS, generated database
 types, request-scoped Supabase clients, Next.js Proxy session refresh, and the
 minimal account interface needed to verify the foundation.
 
-The hosted Supabase project has not received these migrations, and no hosted
-administrator has been provisioned. Marketplace data, payment processing, the
-public homepage, and every marketplace workflow remain later-phase work.
+The Phase 1 migration and deployment-controlled administrator bootstrap were
+verified on the hosted `jasama-dev` development project. No production,
+real-money, government-ID, high-risk administrator, marketplace, or Phase 2
+capability was enabled.
 
 Future contributors and Codex agents must read [AGENTS.md](./AGENTS.md) before
 making changes. Work must stay inside one approved phase from
@@ -67,7 +69,7 @@ least 8 characters with lowercase and uppercase letters, a digit, and a
 symbol; secure password changes are enabled; and email OTPs contain 8
 characters.
 
-Before hosted deployment, configure the Auth redirect allowlist with both
+For each hosted deployment, configure the Auth redirect allowlist with both
 exact trusted destinations derived from `APP_BASE_URL`:
 `${APP_BASE_URL}/auth/confirm` and
 `${APP_BASE_URL}/auth/confirm?next=/auth/update-password`. Do not use a
