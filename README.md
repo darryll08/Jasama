@@ -12,28 +12,35 @@ first: people can explore approved `Jasa`, publish a `Permintaan`, compare
   frozen-lockfile installation, lint, typecheck, 13 unit tests, production
   build, environment validation, and CI configuration.
 
-- **Phase 1 — Ready, not started**  
-  Supabase foundation, account profiles, and authorization have not been
-  implemented yet.
+- **Phase 1 — Complete**
+  Final closure was approved by the Product Owner on 3 August 2026 after local,
+  hosted-development, and hosted-staging verification passed. This approval is
+  limited to the Phase 1 foundation; Phase 2, production launch, real money,
+  government-ID verification, high-risk administrator permission, and every
+  open P1/P2/P3 decision remain outside it.
 
-Phase 0 provides the root Next.js application and quality foundation. The
-repository now has a minimal, non-product application shell, strict TypeScript,
-Tailwind design tokens, environment validation, unit tests, and CI checks.
+Phase 0 provides the root Next.js application and quality foundation. Phase 1A
+adds a reproducible local database, deny-by-default RLS, generated database
+types, request-scoped Supabase clients, Next.js Proxy session refresh, and the
+minimal account interface needed to verify the foundation.
 
-Supabase is not connected. Authentication, database migrations, marketplace
-data, payment processing, the public homepage, and every marketplace workflow
-begin in later approved phases.
+The Phase 1 migration and deployment-controlled administrator bootstrap were
+operator-verified in separate hosted development and staging projects. Local
+configuration and CLI linkage were restored to development afterward. No
+production, real-money, government-ID, high-risk administrator, marketplace,
+or Phase 2 capability was enabled.
 
 Future contributors and Codex agents must read [AGENTS.md](./AGENTS.md) before
 making changes. Work must stay inside one approved phase from
 `docs/IMPLEMENTATION_PLAN.md`.
 
-## Phase 0 setup
+## Local development setup
 
 ### Prerequisites
 
 - Node.js 24 LTS
 - pnpm 11.9.0, as pinned by `package.json`
+- Docker Desktop with a running Docker daemon
 
 ### Install
 
@@ -41,29 +48,78 @@ making changes. Work must stay inside one approved phase from
 pnpm install --frozen-lockfile
 ```
 
-The application builds without real secrets. To set local values, create an
-ignored `.env.local` from `.env.example` and replace its markers. In Phase 0,
-the Supabase variables are optional and unused. `APP_ENV` accepts
+The application builds without real secrets. To exercise Auth locally, create
+an ignored `.env.local` from `.env.example` and use the local URL and
+publishable key reported by the local Supabase CLI. Never copy hosted values
+into source control. `APP_ENV` accepts
 `development`, `test`, `staging`, or `production`; `PAYMENT_MODE` accepts
-`disabled` or `mock`, but production rejects `mock`.
+`disabled` or `mock`, but production rejects `mock`. Set the server-only
+`APP_BASE_URL` to the application's trusted absolute HTTP(S) origin; local
+origins are accepted only in development and test, while staging and
+production require a non-local origin.
 
-Never commit `.env.local`, service-role values, recovery secrets, or encryption
+The browser contract uses `NEXT_PUBLIC_SUPABASE_URL` and
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. `SUPABASE_SECRET_KEY` is server-only
+and is not required for ordinary local account requests. Never commit
+`.env.local`, secret-key values, recovery secrets, or encryption
 keys.
+
+Local email Auth mirrors the reviewed hosted policy: passwords contain at
+least 8 characters with lowercase and uppercase letters, a digit, and a
+symbol; secure password changes are enabled; and email OTPs contain 8
+characters.
+
+For each hosted deployment, configure the Auth redirect allowlist with both
+exact trusted destinations derived from `APP_BASE_URL`:
+`${APP_BASE_URL}/auth/confirm` and
+`${APP_BASE_URL}/auth/confirm?next=/auth/update-password`. Do not use a
+wildcard callback.
 
 ### Working commands
 
 ```sh
+pnpm supabase:start
+pnpm supabase:status
+pnpm db:reset
+pnpm db:lint
+pnpm db:types
+pnpm test:rls
 pnpm dev
 pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
 pnpm start
+pnpm supabase:stop
 ```
 
 `pnpm dev` starts the local development server. `pnpm start` serves a completed
-production build. Lint fails on warnings, tests run once, and typecheck emits no
-files.
+production build. `pnpm db:reset` recreates the local database from committed
+migrations, `pnpm db:types` regenerates the checked-in TypeScript database
+types, and `pnpm test:rls` runs the real local pgTAP suite. Lint fails on
+warnings, tests run once, and typecheck emits no files.
+
+Local Studio, Auth, and Mailpit start with the Supabase stack. Mailpit supports
+manual confirmation and recovery-email testing without an external email
+provider.
+
+The migration seeds `app_environment` for local development only. Staging
+requires the deployment-only reviewed environment-provisioning operation.
+Callable production enablement remains unavailable until the approved
+reauthentication decision is resolved; the development seed is not production
+configuration.
+
+### Implemented account flows
+
+- email/password registration and email confirmation callback;
+- email/password sign-in and local-session sign-out;
+- non-enumerating forgot-password request and password recovery;
+- authenticated base-profile display and updates to approved fields only;
+- owner-only profile and contact-fact access through RLS;
+- exact, server-side administrator permission checks.
+
+OAuth, phone login, anonymous login, administrator provisioning UI, and
+marketplace navigation are intentionally absent.
 
 ## Closed-beta scope
 
@@ -88,9 +144,10 @@ reauthentication exists.
 
 The planned system uses Next.js App Router with strict TypeScript and Tailwind,
 backed by Supabase PostgreSQL, Auth, and private-by-default Storage. Server
-Components are the default. Privileged mutations run through server-controlled
-commands or RPCs with deny-by-default RLS, transaction boundaries,
-idempotency, append-only audit, and an outbox for asynchronous effects.
+Components are the default. Phase 1A provides deny-by-default RLS plus
+idempotency and outbox schema/transaction foundations; later privileged
+mutations and asynchronous workers will use those foundations when their
+owning phases begin.
 
 State transitions follow the authoritative state machines and the exact
 transition-command matrix. Accepted commercial terms are immutable and
@@ -124,14 +181,15 @@ rewrite an authority to match an implementation.
 - Next.js App Router
 - TypeScript in strict mode
 - Tailwind CSS
-- Supabase PostgreSQL, Auth, Storage, SQL migrations, and generated database
-  types beginning in Phase 1
+- Supabase PostgreSQL, Auth, local SQL migrations, pgTAP tests, and generated
+  database types
 - pnpm
 - GitHub
 - Vercel
 
-Phase 0 installs no Supabase, payment, analytics, icon, state-management,
-component-library, or marketplace dependency.
+Phase 1A adds only the official Supabase browser/SSR clients and project-scoped
+CLI. It adds no payment, analytics, icon, state-management, component-library,
+ORM, or marketplace dependency.
 
 ## Environment overview
 

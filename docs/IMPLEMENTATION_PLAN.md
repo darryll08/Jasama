@@ -1,6 +1,6 @@
 # Jasama Implementation Plan
 
-_Last updated: 2026-07-28_
+_Last updated: 2026-08-03_
 
 ## Document authority
 
@@ -20,7 +20,7 @@ checks pass, its scope is audited, and its completion status is recorded.
 | Phase | Status | Completion date |
 |---|---|---|
 | Phase 0 — Repository and quality foundation | **Complete** | 2026-07-28 |
-| Phase 1 — Supabase foundation, account profile, and authorization | **Ready, not started** | — |
+| Phase 1 — Supabase foundation, account profile, and authorization | **Complete** | 2026-08-03 |
 | Phase 2–10 | **Not started** | — |
 
 ### Phase 0 completion evidence
@@ -169,7 +169,8 @@ Phase 1 must not begin before:
 
 ## Phase 1 — Supabase foundation, account profile, and authorization
 
-- **Status:** Ready, not started.
+- **Status:** Complete.
+- **Completion date:** 2026-08-03.
 - **Objective:** Establish identity, base profiles, least-privilege
   authorization, and deployment-controlled initial administrator access.
 - **In scope:** Supabase clients by runtime, Auth-to-profile lifecycle, contact
@@ -197,10 +198,11 @@ Phase 1 must not begin before:
   `grantAdminPermission`/`revokeAdminPermission` where approved. Bootstrap is a
   reviewed migration or provisioning-owner operation, never an application
   command or RPC.
-- **RLS policies:** Owners may read and update only approved profile fields;
-  public projection is minimal; contact facts are owner/service-only;
-  assignments are subject-readable and permission-manager-writable;
-  audit/outbox/idempotency records are privileged-only.
+- **RLS policies:** Owners may read only approved profile and active-contact
+  status columns; profile changes use the reviewed owner command; effective
+  ordinary grants use the minimum safe function projection; base permission,
+  assignment, audit, outbox, idempotency, and environment tables remain
+  privileged-only.
 - **Tests:** Auth/profile lifecycle, deny-by-default RLS, cross-user denial,
   self-grant denial, insufficient-manager denial, successful exact bootstrap,
   idempotent replay, runtime user/admin provisioning denial, set-expansion
@@ -211,7 +213,10 @@ Phase 1 must not begin before:
   redaction.
 - **Data/demo behavior:** Optional non-production profile fixtures are marked
   `is_demo`; production constraints reject them. The bootstrap target must be
-  an existing active, non-demo, Auth-backed profile.
+  an existing active, non-demo, Auth-backed profile. The committed
+  `app_environment` seed is local-development configuration only; staging uses
+  the reviewed deployment-only environment operation. Callable production
+  enablement remains unavailable until verified reauthentication is approved.
 - **Security checks:** Service-role credentials and encryption material remain
   server-only; exact grant target, permission set, and change reference are
   reviewed; no generic role, generic `is_verified`, self-grant, or runtime
@@ -238,9 +243,79 @@ Phase 1 must not begin before:
   ordinary grants through audited management and use reviewed provisioning
   recovery only when no valid permission manager remains. Never delete audit
   history.
-- **Dependencies and blockers:** Supabase project and secret access,
-  provisioning reviewers, bootstrap target, and contact-email mechanism. Phone
+- **Dependencies and blockers:** No Phase 1 closure blocker remains. Phone
   verification may remain unimplemented here but blocks Phase 3 entry.
+
+The hosted evidence below is operator evidence supplied by the Product Owner.
+It was not independently reproduced by local CI.
+
+### Phase 1 hosted development verification evidence — 2026-08-01
+
+- The Phase 1 migration is applied to the hosted development Supabase project.
+- Hosted signup, email confirmation, sign-in, sign-out, password recovery,
+  password update, profile read, and profile update passed.
+- Development email delivery through the Mailtrap sandbox passed.
+- The verified hosted profile is Auth-backed, email-confirmed, active, and
+  non-demo.
+- `app_environment` is `development` with `demo_allowed=true` and
+  `mock_payment_allowed=true`.
+- `provisioning.bootstrap_admin` completed with change reference
+  `JASAMA-PHASE1-BOOTSTRAP-001` and exactly these global ordinary permissions:
+  `admin.permissions.manage`, `profile.support`, and `account.moderate`.
+- The three assignments and the `system_provisioning` audit record were
+  verified. Exact replay created no duplicate assignment, and each active
+  permission has exactly one assignment.
+- `admin.permissions.high_risk` remains inactive and unassigned.
+- No production, real-money, government-ID, Phase 2, or high-risk
+  administrator capability was enabled.
+
+### Phase 1 hosted staging verification evidence — 2026-08-02
+
+- The separate hosted staging project received only the reviewed Phase 1
+  migration, and local and staging migration histories matched afterward.
+- All required Phase 1 tables and the current staging `app_environment`
+  configuration were verified. The earlier `app_environment.seeded` audit
+  event remains historical development-seed evidence, not current staging
+  configuration.
+- Staging email provider, confirmation and password controls, Site URL, exact
+  redirect URLs, and custom SMTP were configured.
+- Signup, email confirmation, sign-in, sign-out, protected account access,
+  password recovery and update, profile read and update, session refresh, and
+  sign-in with the new password passed in staging.
+- The staging profile is Auth-backed, email-confirmed, active, and non-demo;
+  its contact-verification and relevant audit records were verified.
+- `provisioning.bootstrap_admin` completed with change reference
+  `JASAMA-PHASE1-STAGING-BOOTSTRAP-001` and exactly these global ordinary
+  permissions: `admin.permissions.manage`, `profile.support`, and
+  `account.moderate`.
+- The `admin_provisioning.completed` audit uses `system_provisioning` and
+  records the exact three global ordinary permissions. Replay left exactly one
+  active assignment per permission with null `scope_id` and no permission or
+  scope expansion.
+- `admin.permissions.high_risk` remains inactive and unassigned.
+- Local environment values and CLI linkage were restored to development. No
+  production project or production website was modified.
+
+### Phase 1 final Product Owner approval — 2026-08-03
+
+The Product Owner approved final Phase 1 closure based on the passed local
+quality gates, hosted-development and hosted-staging verification,
+development/staging administrator bootstrap, provisioning audit and replay
+idempotency evidence, clean tracked-secret review, restored development
+configuration and CLI linkage, and confirmation that no production project or
+website was modified.
+
+The approval covers the repository environment and CI, Supabase migration
+foundation, authentication and session boundary, base account profile,
+deny-by-default RLS, ordinary administrator permission foundation,
+deployment-controlled bootstrap, append-only audit foundation, idempotency
+foundation, outbox schema and transaction foundation, and hosted development
+and staging readiness.
+
+The approval does not start or approve Phase 2, approve production launch,
+enable real-money payment or production Midtrans, approve refunds, settlement,
+or payouts, enable government-ID verification, enable
+`admin.permissions.high_risk`, or close any open P1, P2, or P3 decision.
 
 ## Phase 2 — Public homepage and discovery with demo data
 

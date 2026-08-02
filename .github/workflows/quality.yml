@@ -14,7 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       APP_ENV: test
+      APP_BASE_URL: http://127.0.0.1:3000
       PAYMENT_MODE: disabled
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: local-ci-publishable-placeholder
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -31,6 +34,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Start local Supabase
+        run: pnpm supabase:start
+
+      - name: Reset and lint database
+        run: |
+          pnpm db:reset
+          pnpm db:lint
+
+      - name: Verify generated database types
+        run: |
+          pnpm db:types
+          git diff --exit-code -- lib/supabase/database.types.ts
+
+      - name: Test database authorization
+        run: pnpm test:rls
+
       - name: Lint
         run: pnpm lint
 
@@ -42,3 +61,7 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Stop local Supabase
+        if: always()
+        run: pnpm supabase:stop --no-backup
