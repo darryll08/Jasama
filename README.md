@@ -12,13 +12,12 @@ first: people can explore approved `Jasa`, publish a `Permintaan`, compare
   frozen-lockfile installation, lint, typecheck, 13 unit tests, production
   build, environment validation, and CI configuration.
 
-- **Phase 1 — Hosted development verification complete**
-  The local and hosted-development Supabase foundation, account profile,
-  authorization, audit, idempotency/outbox schema and transaction foundations,
-  environment guard, accessible email/password Auth flows, custom development
-  SMTP delivery, and exact ordinary administrator bootstrap were verified on
-  1 August 2026. External outbox delivery and asynchronous workers remain
-  later-phase work, not Phase 1 closure requirements.
+- **Phase 1 — Complete**
+  Final closure was approved by the Product Owner on 3 August 2026 after local,
+  hosted-development, and hosted-staging verification passed. This approval is
+  limited to the Phase 1 foundation; Phase 2, production launch, real money,
+  government-ID verification, high-risk administrator permission, and every
+  open P1/P2/P3 decision remain outside it.
 
 Phase 0 provides the root Next.js application and quality foundation. Phase 1A
 adds a reproducible local database, deny-by-default RLS, generated database
@@ -26,9 +25,10 @@ types, request-scoped Supabase clients, Next.js Proxy session refresh, and the
 minimal account interface needed to verify the foundation.
 
 The Phase 1 migration and deployment-controlled administrator bootstrap were
-verified on the hosted `jasama-dev` development project. No production,
-real-money, government-ID, high-risk administrator, marketplace, or Phase 2
-capability was enabled.
+operator-verified in separate hosted development and staging projects. Local
+configuration and CLI linkage were restored to development afterward. No
+production, real-money, government-ID, high-risk administrator, marketplace,
+or Phase 2 capability was enabled.
 
 Future contributors and Codex agents must read [AGENTS.md](./AGENTS.md) before
 making changes. Work must stay inside one approved phase from
